@@ -2,16 +2,24 @@ import pathlib
 import random
 import re
 import sys
+import argparse
 
 
 def main():
-    probability_word_is_twiddled = float(sys.argv[1])
-    file_path = pathlib.Path(sys.argv[2])
+    args = get_commandline_arguments()
+    probability_word_is_twiddled = float(args.p)
+    file_path = pathlib.Path(args.file)
+    max_word_length = args.max_word_length
+    min_word_length = args.min_word_length
+
+    token_filter = TokenFilter(min_word_length, max_word_length)
+
     twiddled_path = append_to_path(file_path, '.TWIDDLED')
     incidents_path = append_to_path(file_path, '.INCIDENTS')
+
     lines = read_lines(file_path)
     tokens = tokenize_lines(lines)
-    tokens = twiddle_random_words(probability_word_is_twiddled, tokens)
+    tokens = twiddle_random_words(probability_word_is_twiddled, tokens, token_filter)
     with open(twiddled_path, 'w') as twiddled_file, open(incidents_path, 'w') as incidents_file:
         for t in tokens:
             if t.is_twiddled():
@@ -20,6 +28,18 @@ def main():
             else:
                 string = t.get_string()
             twiddled_file.write(string)
+
+
+def get_commandline_arguments():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('p', help='Probability that a word is twiddled.', type=float)
+    parser.add_argument('file', help='File to twiddle.')
+    parser.add_argument('--max-word-length', help='The maximum length of a word to be twiddled.',
+            type=int, default=float('inf'))
+    parser.add_argument('--min-word-length', help='The minimum length of a word to be twiddled.',
+            type=int, default=2)
+    args = parser.parse_args()
+    return args
 
 
 def append_to_path(file_path, string):
@@ -40,12 +60,36 @@ def tokenize_lines(lines):
             character_number += len(string)
 
 
-def twiddle_random_words(probability_word_is_twiddled, tokens):
+def twiddle_random_words(probability_word_is_twiddled, tokens, token_filter):
     for token in tokens:
-        if token.is_tiddleable():
+        if token_filter.is_twiddleable(token):
             if random.random() < probability_word_is_twiddled:
                 token.try_to_twiddle()
         yield token
+
+
+class TokenFilter:
+    def __init__(self, min_word_length, max_word_length):
+        self._min_word_length = min_word_length
+        self._max_word_length = max_word_length
+
+    def is_twiddleable(self, token):
+        string = token.get_string()
+        if string is None:
+            return False
+        if not self._min_word_length <= len(string) <= self._max_word_length:
+            return False
+        if self._all_same_character(string):
+            return False
+        if self._contains_non_alphabetic_characters(string):
+            return False
+        return True
+
+    def _all_same_character(self, string):
+        return re.fullmatch(r'(.)\1*', string) is not None
+
+    def _contains_non_alphabetic_characters(self, string):
+        return re.fullmatch('[a-zA-Z]+', string) is None
 
 
 class Token:
@@ -54,15 +98,6 @@ class Token:
         self._character_number = character_number
         self._string = string
         self._twiddled = None
-
-    def is_tiddleable(self):
-        if self._string is None:
-            return False
-        if re.fullmatch('(.)\1*', self._string) is not None:
-            return False
-        if re.fullmatch(r'[a-zA-Z]+', self._string) is None:
-            return False
-        return True
 
     def try_to_twiddle(self):
         for i in range(100):
