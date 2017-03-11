@@ -15,16 +15,14 @@ def main():
     token_filter = TokenFilter(min_word_length, max_word_length)
 
     twiddled_path = append_to_path(file_path, '.TWIDDLED')
-    incidents_path = append_to_path(file_path, '.INCIDENTS')
 
     lines = read_lines(file_path)
     tokens = tokenize_lines(lines)
     tokens = twiddle_random_words(probability_word_is_twiddled, tokens, token_filter)
-    with open(twiddled_path, 'w') as twiddled_file, open(incidents_path, 'w') as incidents_file:
+    with open(twiddled_path, 'w') as twiddled_file:
         for t in tokens:
             if t.is_twiddled():
                 string = t.get_twiddled()
-                incidents_file.write(t.get_incident_string() + '\n')
             else:
                 string = t.get_string()
             twiddled_file.write(string)
@@ -117,9 +115,6 @@ class Token:
 
     def get_twiddled(self):
         return self._twiddled
-
-    def get_incident_string(self):
-        return f'- {{line: {self._line_number}, character: {self._character_number}, twiddled: {self._twiddled}, string: {self._string}}}'
 
 
 if __name__ == '__main__':
