@@ -6,7 +6,7 @@ import argparse
 
 def main():
     args = get_commandline_arguments()
-    probability_word_is_twiddled = float(args.p)
+    probability_word_is_twiddled = float(args.probability)
     max_word_length = args.max_word_length
     min_word_length = args.min_word_length
 
@@ -25,11 +25,24 @@ def main():
 
 def get_commandline_arguments():
     parser = argparse.ArgumentParser()
-    parser.add_argument('p', help='Probability that a word is twiddled.', type=float)
-    parser.add_argument('--max-word-length', help='The maximum length of a word to be twiddled.',
-            type=int, default=float('inf'))
-    parser.add_argument('--min-word-length', help='The minimum length of a word to be twiddled.',
-            type=int, default=2)
+    parser.add_argument(
+            '--probability',
+            help='Probability that a word is twiddled.',
+            type=float,
+            default=0.2
+            )
+    parser.add_argument(
+            '--max-word-length',
+            help='The maximum length of a word to be twiddled.',
+            type=int,
+            default=float('inf')
+            )
+    parser.add_argument(
+            '--min-word-length',
+            help='The minimum length of a word to be twiddled.',
+            type=int,
+            default=2
+            )
     args = parser.parse_args()
     return args
 
