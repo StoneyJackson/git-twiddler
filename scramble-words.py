@@ -6,7 +6,7 @@ import argparse
 
 def main():
     args = get_commandline_arguments()
-    probability_word_is_twiddled = float(args.probability)
+    probability_word_is_scrambled = float(args.probability)
     max_word_length = args.max_word_length
     min_word_length = args.min_word_length
 
@@ -14,10 +14,10 @@ def main():
 
     lines = read_lines()
     tokens = tokenize_lines(lines)
-    tokens = twiddle_random_words(probability_word_is_twiddled, tokens, token_filter)
+    tokens = scramble_random_words(probability_word_is_scrambled, tokens, token_filter)
     for t in tokens:
-        if t.is_twiddled():
-            string = t.get_twiddled()
+        if t.is_scrambled():
+            string = t.get_scrambled()
         else:
             string = t.get_string()
         print(string, end='')
@@ -27,19 +27,19 @@ def get_commandline_arguments():
     parser = argparse.ArgumentParser()
     parser.add_argument(
             '--probability',
-            help='Probability that a word is twiddled.',
+            help='Probability that a word is scrambled.',
             type=float,
             default=0.2
             )
     parser.add_argument(
             '--max-word-length',
-            help='The maximum length of a word to be twiddled.',
+            help='The maximum length of a word to be scrambled.',
             type=int,
             default=float('inf')
             )
     parser.add_argument(
             '--min-word-length',
-            help='The minimum length of a word to be twiddled.',
+            help='The minimum length of a word to be scrambled.',
             type=int,
             default=2
             )
@@ -60,11 +60,11 @@ def tokenize_lines(lines):
             character_number += len(string)
 
 
-def twiddle_random_words(probability_word_is_twiddled, tokens, token_filter):
+def scramble_random_words(probability_word_is_scrambled, tokens, token_filter):
     for token in tokens:
-        if token_filter.is_twiddleable(token):
-            if random.random() < probability_word_is_twiddled:
-                token.try_to_twiddle()
+        if token_filter.is_scrambleable(token):
+            if random.random() < probability_word_is_scrambled:
+                token.try_to_scramble()
         yield token
 
 
@@ -73,7 +73,7 @@ class TokenFilter:
         self._min_word_length = min_word_length
         self._max_word_length = max_word_length
 
-    def is_twiddleable(self, token):
+    def is_scrambleable(self, token):
         string = token.get_string()
         if string is None:
             return False
@@ -97,26 +97,26 @@ class Token:
         self._line_number = line_number
         self._character_number = character_number
         self._string = string
-        self._twiddled = None
+        self._scrambled = None
 
-    def try_to_twiddle(self):
+    def try_to_scramble(self):
         for i in range(100):
             string_list = list(self._string)
             random.shuffle(string_list)
-            self._twiddled = ''.join(string_list)
-            if self._twiddled != self._string:
+            self._scrambled = ''.join(string_list)
+            if self._scrambled != self._string:
                 break
-        if self._twiddled == self._string:
-            self._twiddled = None
+        if self._scrambled == self._string:
+            self._scrambled = None
 
-    def is_twiddled(self):
-        return self._twiddled is not None
+    def is_scrambled(self):
+        return self._scrambled is not None
 
     def get_string(self):
         return self._string
 
-    def get_twiddled(self):
-        return self._twiddled
+    def get_scrambled(self):
+        return self._scrambled
 
 
 if __name__ == '__main__':

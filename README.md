@@ -1,26 +1,12 @@
-# git-twiddler
+# word-scrambler
 
-# Twiddle
-`python twiddle.py P FILE`
+Reads a stream of text from standard input and prints that input to standard
+output but with randomly selected words scrambled.
 
-Generates a FILE.TWIDDLED with the contents of FILE with random words twiddled
-(scrambled). Each word is twiddled with probability P. Generates two files:
+	python scramble-word.py < infile > outfile
 
-- FILE.TWIDDLED: The same as file with randomly words twiddled.
-- FILE.INCIDENTS: Contains information about each twiddled word.
+To learn about the command-line options scramble-word.py offers, run it with
+the -h option.
 
-## Example
+	python scramble-word.py -h
 
-```
-$ python twiddle.py .1 LICENSE
-```
-
-Generates `LICENSE.TWIDDLED` with the same content as `LICENSE` except that each
-alphabetic word is twiddled with a probability of 10% (.1). Also generates
-`LICENSE.INCIDENTS`.
-
-```
-$ cat LICENSE.INCIDENTS
-- {line: 502, character: 10, twiddled: lbeiaaalv, string: available}
-- {line: 614, character: 61, twiddled: dovedirp, string: provided}
-```
