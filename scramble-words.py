@@ -14,18 +14,15 @@ def main():
 
     token_filter = TokenFilter(min_word_length, max_word_length)
 
-    twiddled_path = append_to_path(file_path, '.TWIDDLED')
-
     lines = read_lines(file_path)
     tokens = tokenize_lines(lines)
     tokens = twiddle_random_words(probability_word_is_twiddled, tokens, token_filter)
-    with open(twiddled_path, 'w') as twiddled_file:
-        for t in tokens:
-            if t.is_twiddled():
-                string = t.get_twiddled()
-            else:
-                string = t.get_string()
-            twiddled_file.write(string)
+    for t in tokens:
+        if t.is_twiddled():
+            string = t.get_twiddled()
+        else:
+            string = t.get_string()
+        print(string, end='')
 
 
 def get_commandline_arguments():
@@ -38,10 +35,6 @@ def get_commandline_arguments():
             type=int, default=2)
     args = parser.parse_args()
     return args
-
-
-def append_to_path(file_path, string):
-    return file_path.with_name(file_path.name + string)
 
 
 def read_lines(filename):
