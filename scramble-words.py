@@ -1,4 +1,3 @@
-import pathlib
 import random
 import re
 import sys
@@ -8,13 +7,12 @@ import argparse
 def main():
     args = get_commandline_arguments()
     probability_word_is_twiddled = float(args.p)
-    file_path = pathlib.Path(args.file)
     max_word_length = args.max_word_length
     min_word_length = args.min_word_length
 
     token_filter = TokenFilter(min_word_length, max_word_length)
 
-    lines = read_lines(file_path)
+    lines = read_lines()
     tokens = tokenize_lines(lines)
     tokens = twiddle_random_words(probability_word_is_twiddled, tokens, token_filter)
     for t in tokens:
@@ -28,7 +26,6 @@ def main():
 def get_commandline_arguments():
     parser = argparse.ArgumentParser()
     parser.add_argument('p', help='Probability that a word is twiddled.', type=float)
-    parser.add_argument('file', help='File to twiddle.')
     parser.add_argument('--max-word-length', help='The maximum length of a word to be twiddled.',
             type=int, default=float('inf'))
     parser.add_argument('--min-word-length', help='The minimum length of a word to be twiddled.',
@@ -37,10 +34,9 @@ def get_commandline_arguments():
     return args
 
 
-def read_lines(filename):
-    with open(filename) as f:
-        for line in f:
-            yield line
+def read_lines():
+    for line in sys.stdin:
+        yield line
 
 
 def tokenize_lines(lines):
