@@ -1,4 +1,4 @@
-# word-scrambler
+# scramble-words.py
 
 Reads a stream of text from standard input and prints that input to standard
 output but with randomly selected words scrambled.
